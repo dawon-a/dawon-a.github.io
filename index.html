@@ -400,6 +400,12 @@ const validateScope=()=>{
   return !!sel;
 };
 const validateW23=()=>{
+  const scope=d.querySelector('input[name="scope"]:checked')?.value||"";
+  // ✅ 교내일 때는 이격거리 필수 아님
+  if(scope==="교내"){
+    showErr("#rowW23","#errW23",false);
+    return true;
+  }
   const v=$("#w23").value.trim();
   showErr("#rowW23","#errW23",v==="");
   return v!=="";
@@ -415,22 +421,35 @@ const toggleW26Required=()=>{
 ["blur","input","change"].forEach(ev=>{
   d.addEventListener(ev, e=>{
     if(e.target?.id==="w23") validateW23();
-    if(e.target?.name==="scope") validateScope();
+    if(e.target?.name==="scope"){
+      validateScope();
+      validateW23(); // 위치구분 바뀔 때 이격거리 에러도 재조정
+    }
     if(["w24","w25","w26"].includes(e.target?.id)) toggleW26Required();
   }, true);
 });
 
 /* 판정 로직
+   - 교내: 이격거리 입력 없이도 대상
    - 교외&4<이격≤50&층수≥3 → 대상
    - 교외&4<이격≤50&높이≥10 & 이격<높이 → 대상
    - 나머지 조건은 이전과 동일
 */
 const judge=(p)=>{
-  if(!p.scope && p.w23){return {type:"guide",msg:"위치구분을 선택해주세요"};}
-  if(!p.scope || !p.w23){return {type:"guide",msg:"이격거리를 입력해주세요"};}
+  const rawW23 = $("#w23").value.trim();
 
+  if(!p.scope && rawW23){return {type:"guide",msg:"위치구분을 선택해주세요"};}
+
+  if(!p.scope){return {type:"guide",msg:"위치구분을 선택해주세요"};}
+
+  // ✅ 교내: 이격거리와 무관하게 작성 대상
   if(p.scope==="교내")
     return {type:"good",msg:"(교내)건축허가 및 건축승인에 따른 교육시설"};
+
+  // 교외인 경우에만 이격거리 필수로 체크
+  if(p.scope==="교외" && !rawW23){
+    return {type:"guide",msg:"이격거리를 입력해주세요"};
+  }
 
   if(p.scope==="교외" && p.w23<=4)
     return {type:"good",msg:"(교외)학교경계로부터 직선거리 4미터 이내의 건설공사"};
@@ -506,6 +525,7 @@ $("#check").addEventListener("click",()=>{
 
   if(!okScope || !okW23 || !okW26){
     if(!okScope && $("#w23").value) return render({type:"guide",msg:"위치구분을 선택해주세요"});
+    // 교외일 때만 이격거리 가이드가 의미 있으므로, validateW23 내부에서 이미 처리
     if(!okW23) return render({type:"guide",msg:"이격거리를 입력해주세요"});
     if(!okW26) return render({type:"guide",msg:"굴착·단차 입력 시 ‘부지높이 관계’를 선택해주세요"});
   }
@@ -565,5 +585,3 @@ document.addEventListener("DOMContentLoaded",()=>{
 </script>
 </body>
 </html>
-
-
