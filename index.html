@@ -33,21 +33,40 @@
     font-size:28px;
     letter-spacing:-.5px;
   }
-  /* ✅ hits.sh 배지 스타일 */
+
+/* ✅ hits.sh 배지 스타일 (PC 기본) */
+.hit-badge{
+  position:absolute;
+  right:20px;
+  top:50%;
+  transform:translateY(-50%);
+  display:flex;
+  align-items:center;
+}
+
+.hit-badge img{
+  display:block;
+  height:22px;
+  border-radius:999px;
+  box-shadow:0 2px 6px rgba(0,0,0,.25);
+}
+
+/* ✅ 모바일에서는 제목을 가리지 않도록 아래로 이동 + 크기 축소 */
+@media (max-width:640px){
   .hit-badge{
-    position:absolute;
-    right:20px;
-    top:50%;
-    transform:translateY(-50%);
+    position:static;
+    transform:none;
+    margin-top:6px;
     display:flex;
-    align-items:center;
+    justify-content:center;
   }
+
   .hit-badge img{
-    display:block;
-    height:22px;
-    border-radius:999px;
-    box-shadow:0 2px 6px rgba(0,0,0,.25);
+    height:16px;     /* ← 크기 축소 */
+    box-shadow:0 1px 4px rgba(0,0,0,.2);
   }
+}
+
 
   .wrap{
     max-width:980px;
