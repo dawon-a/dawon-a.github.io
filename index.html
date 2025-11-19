@@ -378,15 +378,15 @@
   <section class="card" aria-labelledby="formTitle">
     <h2 id="formTitle" class="visually-hidden">입력</h2>
 
-    <!-- 위치 구분 -->
+    <!-- 공사 위치 구분 -->
     <div class="row" id="rowScope">
-      <div class="label">위치 구분<span class="req">*</span></div>
+      <div class="label">공사 위치<span class="req">*</span></div>
       <div>
         <div class="radio" role="radiogroup">
           <label><input type="radio" name="scope" value="교내"> 교내</label>
           <label><input type="radio" name="scope" value="교외"> 교외</label>
         </div>
-        <div class="err" id="errScope" aria-live="polite">위치구분을 선택해주세요</div>
+        <div class="err" id="errScope" aria-live="polite">공사 위치를 선택해주세요</div>
       </div>
     </div>
 
@@ -651,8 +651,11 @@
       return {type:"guide", msg:MSG.NEED_SCOPE};
     }
 
-    // 교내: 이격거리와 무관하게(0 포함) 작성 대상
+    // ✅ 교내: 해체공사는 비대상, 그 외는 대상
     if(p.scope === "교내"){
+      if(p.w30 === "건축물 해체공사(허가)" || p.w30 === "건축물 해체공사(신고)"){
+        return {type:"bad", msg:MSG.NOT_TARGET};
+      }
       return {type:"good", msg:MSG.SCOPE_IN};
     }
 
